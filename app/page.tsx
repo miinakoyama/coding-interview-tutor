@@ -1,11 +1,24 @@
 "use client";
 
+import React, { useState } from 'react';
+
 import Link from 'next/link';
 import { PROBLEMS } from '@/lib/problems';
 import { ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export default function Home() {
+  const [selectedDifficulty, setSelectedDifficulty] = useState<string>('All');
+  const [selectedTag, setSelectedTag] = useState<string>('All');
+
+  const allTags = Array.from(new Set(PROBLEMS.flatMap(p => p.tags))).sort();
+
+  const filteredProblems = PROBLEMS.filter(problem => {
+    const difficultyMatch = selectedDifficulty === 'All' || problem.difficulty === selectedDifficulty;
+    const tagMatch = selectedTag === 'All' || problem.tags.includes(selectedTag);
+    return difficultyMatch && tagMatch;
+  });
+
   return (
     <main className="min-h-screen bg-gray-50">
       <div className="max-w-5xl mx-auto px-4 py-12">
@@ -28,9 +41,36 @@ export default function Home() {
         </div>
 
         <div className="space-y-6">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Select a Problem</h2>
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
+            <h2 className="text-2xl font-bold text-gray-900">Select a Problem</h2>
+
+            <div className="flex gap-4">
+              <select
+                value={selectedDifficulty}
+                onChange={(e) => setSelectedDifficulty(e.target.value)}
+                className="px-4 py-2 rounded-lg border border-gray-200 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="All">All Difficulties</option>
+                <option value="Easy">Easy</option>
+                <option value="Medium">Medium</option>
+                <option value="Hard">Hard</option>
+              </select>
+
+              <select
+                value={selectedTag}
+                onChange={(e) => setSelectedTag(e.target.value)}
+                className="px-4 py-2 rounded-lg border border-gray-200 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="All">All Topics</option>
+                {allTags.map(tag => (
+                  <option key={tag} value={tag}>{tag}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
           <div className="grid gap-4">
-            {PROBLEMS.map((problem, idx) => (
+            {filteredProblems.map((problem, idx) => (
               <motion.div
                 key={problem.id}
                 initial={{ opacity: 0, x: -20 }}
@@ -56,12 +96,25 @@ export default function Home() {
                         </span>
                       </div>
                       <p className="text-gray-600 mb-3">{problem.description}</p>
+                      <div className="flex gap-2 flex-wrap">
+                        {problem.tags.map(tag => (
+                          <span key={tag} className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
                     </div>
                     <ArrowRight className="text-gray-400 group-hover:text-blue-600 transform group-hover:translate-x-1 transition-all" />
                   </div>
                 </Link>
               </motion.div>
             ))}
+
+            {filteredProblems.length === 0 && (
+              <div className="text-center py-12 text-gray-500">
+                No problems found matching your filters.
+              </div>
+            )}
           </div>
         </div>
       </div>
