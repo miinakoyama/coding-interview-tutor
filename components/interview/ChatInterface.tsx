@@ -2,7 +2,7 @@
 
 import React, { useRef, useEffect, useState } from 'react';
 import { Message } from '@/lib/interview-flow';
-import { Send, Mic, MicOff, User, Bot } from 'lucide-react';
+import { Send, Mic, MicOff, User, Bot, Lightbulb, Info } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -12,6 +12,8 @@ interface ChatInterfaceProps {
     isRecording: boolean;
     onToggleRecording: () => void;
     isSpeaking: boolean;
+    voiceEnabled?: boolean;
+    onRequestHint?: () => void;
 }
 
 export function ChatInterface({
@@ -19,7 +21,9 @@ export function ChatInterface({
     onSendMessage,
     isRecording,
     onToggleRecording,
-    isSpeaking
+    isSpeaking,
+    voiceEnabled = true,
+    onRequestHint
 }: ChatInterfaceProps) {
     const [input, setInput] = useState('');
     const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -90,19 +94,22 @@ export function ChatInterface({
 
             <div className="p-4 border-t bg-gray-50">
                 <form onSubmit={handleSubmit} className="flex gap-2 items-end">
-                    <button
-                        type="button"
-                        onClick={onToggleRecording}
-                        className={cn(
-                            "p-2 rounded-full transition-colors mb-1",
-                            isRecording
-                                ? "bg-red-100 text-red-600 hover:bg-red-200"
-                                : "bg-gray-200 text-gray-600 hover:bg-gray-300"
-                        )}
-                        title={isRecording ? "Stop recording" : "Start recording"}
-                    >
-                        {isRecording ? <MicOff size={20} /> : <Mic size={20} />}
-                    </button>
+                    {/* Voice button - only show if voice is enabled */}
+                    {voiceEnabled && (
+                        <button
+                            type="button"
+                            onClick={onToggleRecording}
+                            className={cn(
+                                "p-2 rounded-full transition-colors mb-1",
+                                isRecording
+                                    ? "bg-red-100 text-red-600 hover:bg-red-200"
+                                    : "bg-gray-200 text-gray-600 hover:bg-gray-300"
+                            )}
+                            title={isRecording ? "Stop recording" : "Start recording"}
+                        >
+                            {isRecording ? <MicOff size={20} /> : <Mic size={20} />}
+                        </button>
+                    )}
 
                     <textarea
                         ref={textareaRef}
@@ -111,23 +118,42 @@ export function ChatInterface({
                         onKeyDown={(e) => {
                             if (e.key === 'Enter' && !e.shiftKey) {
                                 e.preventDefault();
-                                handleSubmit(e as any);
+                                handleSubmit(e as unknown as React.FormEvent);
                             }
                         }}
                         placeholder="Type your message... (Shift+Enter for new line)"
-                        className="flex-1 px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white resize-none min-h-[44px] max-h-[120px]"
-                        rows={1}
-                        style={{ height: 'auto', minHeight: '44px' }}
+                        className="flex-1 px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white resize-none min-h-[80px] max-h-[200px]"
+                        rows={3}
+                        style={{ height: 'auto', minHeight: '80px' }}
                     />
 
-                    <button
-                        type="submit"
-                        disabled={!input.trim()}
-                        className="p-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors mb-1"
-                    >
-                        <Send size={20} />
-                    </button>
+                    <div className="flex flex-col gap-2 items-center mb-1">
+                        {onRequestHint && (
+                            <button
+                                type="button"
+                                onClick={onRequestHint}
+                                className="p-1.5 rounded-full bg-yellow-50 text-yellow-600 hover:bg-yellow-100 transition-colors"
+                                title="Request a hint"
+                            >
+                                <Lightbulb size={16} />
+                            </button>
+                        )}
+
+                        <button
+                            type="submit"
+                            disabled={!input.trim()}
+                            className="p-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        >
+                            <Send size={20} />
+                        </button>
+                    </div>
                 </form>
+
+                {/* G2: AI Limitations disclaimer */}
+                <div className="mt-2 flex items-center gap-1.5 text-xs text-gray-400">
+                    <Info size={12} />
+                    <span>AI won&apos;t give direct answers. No code execution available.</span>
+                </div>
             </div>
         </div>
     );
