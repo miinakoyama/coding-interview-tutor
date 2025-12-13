@@ -19,6 +19,7 @@ import {
   Timer as TimerIcon,
   Settings,
   AlertTriangle,
+  FileText,
 } from "lucide-react";
 import {
   INITIAL_CODE_TEMPLATES,
@@ -295,9 +296,8 @@ export function InterviewSession({ problem }: InterviewSessionProps) {
 
           {/* Step time indicator */}
           <div
-            className={`mt-2 text-xs flex items-center gap-1.5 ${
-              isOverTime ? "text-orange-600" : "text-gray-400"
-            }`}
+            className={`mt-2 text-xs flex items-center gap-1.5 ${isOverTime ? "text-orange-600" : "text-gray-400"
+              }`}
           >
             <TimerIcon size={12} />
             <span>
@@ -318,13 +318,12 @@ export function InterviewSession({ problem }: InterviewSessionProps) {
                 >
                   <div
                     className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold border-2 cursor-help
-                                            ${
-                                              isCurrent
-                                                ? "border-blue-500 bg-blue-50 text-blue-600"
-                                                : isPast
-                                                ? "border-green-500 bg-green-50 text-green-600"
-                                                : "border-gray-200 text-gray-400"
-                                            }`}
+                                            ${isCurrent
+                        ? "border-blue-500 bg-blue-50 text-blue-600"
+                        : isPast
+                          ? "border-green-500 bg-green-50 text-green-600"
+                          : "border-gray-200 text-gray-400"
+                      }`}
                   >
                     {isPast ? <CheckCircle2 size={16} /> : idx + 1}
                   </div>
@@ -332,13 +331,12 @@ export function InterviewSession({ problem }: InterviewSessionProps) {
                   {/* Tooltip */}
                   <div
                     className={`absolute bottom-full mb-2 hidden group-hover:block w-48 p-2 bg-gray-900 text-white text-xs rounded shadow-lg z-10 text-center
-                                        ${
-                                          idx <= 1
-                                            ? "left-0"
-                                            : idx === INTERVIEW_STEPS.length - 1
-                                            ? "right-0"
-                                            : "left-1/2 -translate-x-1/2"
-                                        }`}
+                                        ${idx <= 1
+                        ? "left-0"
+                        : idx === INTERVIEW_STEPS.length - 1
+                          ? "right-0"
+                          : "left-1/2 -translate-x-1/2"
+                      }`}
                   >
                     <div className="font-bold mb-1 capitalize">
                       {step.replace("_", " ")}
@@ -352,14 +350,13 @@ export function InterviewSession({ problem }: InterviewSessionProps) {
                     {/* Arrow */}
                     <div
                       className={`absolute top-full border-4 border-transparent border-t-gray-900
-                                            ${
-                                              idx <= 1
-                                                ? "left-4 -translate-x-1/2"
-                                                : idx ===
-                                                  INTERVIEW_STEPS.length - 1
-                                                ? "right-4 translate-x-1/2"
-                                                : "left-1/2 -translate-x-1/2"
-                                            }`}
+                                            ${idx <= 1
+                          ? "left-4 -translate-x-1/2"
+                          : idx ===
+                            INTERVIEW_STEPS.length - 1
+                            ? "right-4 translate-x-1/2"
+                            : "left-1/2 -translate-x-1/2"
+                        }`}
                     ></div>
                   </div>
                 </div>
@@ -428,13 +425,12 @@ export function InterviewSession({ problem }: InterviewSessionProps) {
               <div className="flex gap-2">
                 <span
                   className={`px-2 py-0.5 rounded text-xs font-medium
-                                    ${
-                                      problem.difficulty === "Easy"
-                                        ? "bg-green-100 text-green-700"
-                                        : problem.difficulty === "Medium"
-                                        ? "bg-yellow-100 text-yellow-700"
-                                        : "bg-red-100 text-red-700"
-                                    }`}
+                                    ${problem.difficulty === "Easy"
+                      ? "bg-green-100 text-green-700"
+                      : problem.difficulty === "Medium"
+                        ? "bg-yellow-100 text-yellow-700"
+                        : "bg-red-100 text-red-700"
+                    }`}
                 >
                   {problem.difficulty}
                 </span>
@@ -462,8 +458,14 @@ export function InterviewSession({ problem }: InterviewSessionProps) {
               </button>
             </div>
           </div>
-          <div className="text-gray-700 text-sm bg-gray-50 p-3 rounded border">
-            {problem.description}
+          <div className="bg-blue-50 p-4 rounded-lg border border-blue-100 shadow-sm">
+            <div className="flex items-center gap-2 mb-2 text-blue-800 font-semibold">
+              <FileText size={18} />
+              <h3>Problem Statement</h3>
+            </div>
+            <div className="text-gray-800 text-base leading-relaxed">
+              {problem.description}
+            </div>
           </div>
         </div>
 
