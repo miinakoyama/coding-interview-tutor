@@ -1,4 +1,44 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Coding Interview Tutor
+
+## App Overview
+**Coding Interview Tutor** is an AI-powered application designed to simulate real-world technical interviews. It helps users practice algorithm problems through a guided, interactive session with an AI interviewer.
+Instead of jumping straight to code, the app enforces a structured workflow:
+- Clarify the problem - Learners write input/output examples and ask clarifying questions about constraints.
+- Plan an approach - Discuss possible strategies with the AI interviewer.
+- Request to code - Learners ask for permission to begin coding; the AI either approves or suggests reconsideration.
+- Write code - Learners type their solution in a text-based editor.
+- Joint debugging - Learners manually trace the code while the AI asks guiding questions.
+Analyze complexity - Learners explain time/space complexity.
+Reflect and improve - The AI prompts reflection on potential optimizations or design trade-offs.
+
+This process helps candidates develop the "Think Aloud" habit and structured problem-solving skills essential for acing technical interviews.
+
+## Tech Stack
+**Frontend & Framework:**
+- Next.js 16 (App Router)
+- TypeScript
+- React 19
+
+**Styling & UI:**
+- Tailwind CSS v4
+- Framer Motion
+- Lucide React
+- React Simple Code Editor / PrismJS
+
+**AI & Backend:**
+- Google Generative AI SDK (Gemini)
+
+## Requirement: Gemini API Setup
+To use the AI interviewer features, this application requires a valid API key from Google Gemini.
+
+1.  **Get an API Key**: Visit [Google AI Studio](https://aistudio.google.com/) to create a new API key.
+2.  **Configure Environment**:
+    - Create a file named `.env.local` in the root directory.
+    - Add your API key to this file:
+      ```bash
+      NEXT_PUBLIC_GEMINI_API_KEY=your_api_key_here
+      ```
+    - Restart the development server if it is already running.
 
 ## Getting Started
 
@@ -15,22 +55,3 @@ bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
