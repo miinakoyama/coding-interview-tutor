@@ -124,8 +124,3 @@ This application was designed following the [Guidelines for Human-AI Interaction
 | **G13: Learn from user behavior**     | User preferences (default programming language, voice settings) are persisted in LocalStorage and automatically applied in future sessions.                              |
 | **G15: Encourage granular feedback**  | After completing or exiting a session, users are presented with an optional feedback modal featuring star ratings and free-text comments.                                |
 | **G17: Provide global controls**      | A settings panel (⚙️) allows users to toggle voice input, auto-speak responses, and set their preferred programming language at any time.                                |
-
-### Additional UX Considerations
-
-- **Exit Confirmation**: When users click "Exit Interview," a confirmation dialog warns that progress will be lost, preventing accidental data loss.
-- **Step Progress Indicator**: A visual step tracker shows completed, current, and upcoming steps with tooltips explaining each phase.
