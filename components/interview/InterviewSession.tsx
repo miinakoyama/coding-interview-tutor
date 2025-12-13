@@ -220,7 +220,7 @@ export function InterviewSession({ problem }: InterviewSessionProps) {
         const errorMsg: Message = {
           id: `error-${Date.now()}`,
           role: "assistant",
-          content: "I'm sorry, I encountered an error. Please try again.",
+          content: error instanceof Error ? error.message : "I'm sorry, I encountered an error. Please try again.",
           timestamp: Date.now(),
         };
         setState((prev) => ({

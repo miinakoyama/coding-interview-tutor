@@ -1,10 +1,12 @@
-import { GoogleGenerativeAI } from '@google/generative-ai';
-import { NextResponse } from 'next/server';
-import { INTERVIEW_STEPS, STEP_DESCRIPTIONS } from '@/lib/interview-flow';
+import { GoogleGenerativeAI } from "@google/generative-ai";
+import { NextResponse } from "next/server";
+import { INTERVIEW_STEPS, STEP_DESCRIPTIONS } from "@/lib/interview-flow";
 
 // Initialize Gemini API
 // Note: In a real app, this should be in a singleton or service
-const genAI = new GoogleGenerativeAI(process.env.NEXT_PUBLIC_GEMINI_API_KEY || '');
+const genAI = new GoogleGenerativeAI(
+  process.env.NEXT_PUBLIC_GEMINI_API_KEY || ""
+);
 
 const SYSTEM_PROMPTS = {
   clarify: `You are a coding interview interviewer. The candidate is in the "Clarify" step. 
@@ -43,28 +45,32 @@ const SYSTEM_PROMPTS = {
 
   reflect: `You are a coding interview interviewer. The candidate is in the "Reflect" step.
   - Ask what they would improve if they had more time.
-  - Discuss trade-offs.`
+  - Discuss trade-offs.`,
 };
 
 export async function POST(req: Request) {
   try {
-    const { messages, currentStep, code, language, problemId } = await req.json();
+    const { messages, currentStep, code, language, problemId } =
+      await req.json();
 
     if (!process.env.NEXT_PUBLIC_GEMINI_API_KEY) {
       return NextResponse.json({
-        reply: "I'm ready to help, but I need a Gemini API Key to function. Please configure it in your environment variables."
+        reply:
+          "I'm ready to help, but I need a Gemini API Key to function. Please configure it in your environment variables.",
       });
     }
 
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
     const systemPrompt = `
       You are an expert technical interviewer conducting a coding interview.
-      Current Step: ${currentStep} (${STEP_DESCRIPTIONS[currentStep as keyof typeof STEP_DESCRIPTIONS]})
+      Current Step: ${currentStep} (${
+      STEP_DESCRIPTIONS[currentStep as keyof typeof STEP_DESCRIPTIONS]
+    })
       Problem ID: ${problemId}
-      Current Language: ${language || 'Not specified'}
+      Current Language: ${language || "Not specified"}
       Current Code:
-      \`\`\`${language || 'javascript'}
+      \`\`\`${language || "javascript"}
       ${code}
       \`\`\`
       
@@ -84,27 +90,31 @@ export async function POST(req: Request) {
 
     // Convert messages to Gemini format
     const history = messages.map((m: any) => ({
-      role: m.role === 'assistant' ? 'model' : 'user',
-      parts: [{ text: m.content }]
+      role: m.role === "assistant" ? "model" : "user",
+      parts: [{ text: m.content }],
     }));
 
     // Add system prompt as the first part of the conversation or context
-    // Gemini Pro doesn't support system instructions in the same way as OpenAI, 
+    // Gemini Pro doesn't support system instructions in the same way as OpenAI,
     // but we can prepend it to the first message or use it as context.
     // A common pattern is to send it as the first user message.
 
     const chat = model.startChat({
       history: [
         {
-          role: 'user',
-          parts: [{ text: systemPrompt }]
+          role: "user",
+          parts: [{ text: systemPrompt }],
         },
         {
-          role: 'model',
-          parts: [{ text: "Understood. I am ready to conduct the interview as per your instructions." }]
+          role: "model",
+          parts: [
+            {
+              text: "Understood. I am ready to conduct the interview as per your instructions.",
+            },
+          ],
         },
-        ...history.slice(0, -1) // All but last message
-      ]
+        ...history.slice(0, -1), // All but last message
+      ],
     });
 
     const lastMessage = messages[messages.length - 1].content;
@@ -118,20 +128,70 @@ export async function POST(req: Request) {
 
     // This is a very basic state transition logic based on keywords
     // In a real app, we might ask the LLM to output a JSON with { reply, nextStep }
-    if (currentStep === 'clarify' && (lowerText.includes('plan') || lowerText.includes('next step'))) nextStep = 'plan';
-    else if (currentStep === 'plan' && (lowerText.includes('code') || lowerText.includes('implement'))) nextStep = 'request_code';
-    else if (currentStep === 'request_code' && (lowerText.includes('go ahead') || lowerText.includes('start'))) nextStep = 'write_code';
-    else if (currentStep === 'write_code' && (lowerText.includes('debug') || lowerText.includes('test'))) nextStep = 'debug';
-    else if (currentStep === 'debug' && (lowerText.includes('complexity') || lowerText.includes('analyze'))) nextStep = 'analyze';
-    else if (currentStep === 'analyze' && (lowerText.includes('reflect') || lowerText.includes('improve'))) nextStep = 'reflect';
+    if (
+      currentStep === "clarify" &&
+      (lowerText.includes("plan") || lowerText.includes("next step"))
+    )
+      nextStep = "plan";
+    else if (
+      currentStep === "plan" &&
+      (lowerText.includes("code") || lowerText.includes("implement"))
+    )
+      nextStep = "request_code";
+    else if (
+      currentStep === "request_code" &&
+      (lowerText.includes("go ahead") || lowerText.includes("start"))
+    )
+      nextStep = "write_code";
+    else if (
+      currentStep === "write_code" &&
+      (lowerText.includes("debug") || lowerText.includes("test"))
+    )
+      nextStep = "debug";
+    else if (
+      currentStep === "debug" &&
+      (lowerText.includes("complexity") || lowerText.includes("analyze"))
+    )
+      nextStep = "analyze";
+    else if (
+      currentStep === "analyze" &&
+      (lowerText.includes("reflect") || lowerText.includes("improve"))
+    )
+      nextStep = "reflect";
 
     return NextResponse.json({
       reply: text,
-      nextStep
+      nextStep,
     });
+  } catch (error: any) {
+    console.error("API Error:", error);
 
-  } catch (error) {
-    console.error('API Error:', error);
-    return NextResponse.json({ error: 'Failed to process request' }, { status: 500 });
+    // Check for rate limiting (429) or service unavailable (503)
+    if (
+      error.status === 429 ||
+      error.message?.includes("429") ||
+      error.message?.includes("Too Many Requests")
+    ) {
+      return NextResponse.json(
+        {
+          error: "You are sending requests too quickly. Please wait a moment.",
+        },
+        { status: 429 }
+      );
+    }
+
+    if (error.status === 503 || error.message?.includes("503")) {
+      return NextResponse.json(
+        {
+          error: "The service is currently overloaded. Please try again later.",
+        },
+        { status: 503 }
+      );
+    }
+
+    return NextResponse.json(
+      { error: "Failed to process request" },
+      { status: 500 }
+    );
   }
 }
