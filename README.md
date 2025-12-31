@@ -73,7 +73,7 @@ To use the AI interviewer features, this application requires a valid API key fr
     - Create a file named `.env.local` in the root directory.
     - Add your API key to this file:
       ```bash
-      NEXT_PUBLIC_GEMINI_API_KEY=your_api_key_here
+      GEMINI_API_KEY=your_api_key_here
       ```
     - Restart the development server if it is already running.
 

@@ -5,7 +5,7 @@ import { INTERVIEW_STEPS, STEP_DESCRIPTIONS } from "@/lib/interview-flow";
 // Initialize Gemini API
 // Note: In a real app, this should be in a singleton or service
 const genAI = new GoogleGenerativeAI(
-  process.env.NEXT_PUBLIC_GEMINI_API_KEY || ""
+  process.env.GEMINI_API_KEY || ""
 );
 
 const SYSTEM_PROMPTS = {
@@ -53,7 +53,7 @@ export async function POST(req: Request) {
     const { messages, currentStep, code, language, problemId } =
       await req.json();
 
-    if (!process.env.NEXT_PUBLIC_GEMINI_API_KEY) {
+    if (!process.env.GEMINI_API_KEY) {
       return NextResponse.json({
         reply:
           "I'm ready to help, but I need a Gemini API Key to function. Please configure it in your environment variables.",
@@ -64,9 +64,8 @@ export async function POST(req: Request) {
 
     const systemPrompt = `
       You are an expert technical interviewer conducting a coding interview.
-      Current Step: ${currentStep} (${
-      STEP_DESCRIPTIONS[currentStep as keyof typeof STEP_DESCRIPTIONS]
-    })
+      Current Step: ${currentStep} (${STEP_DESCRIPTIONS[currentStep as keyof typeof STEP_DESCRIPTIONS]
+      })
       Problem ID: ${problemId}
       Current Language: ${language || "Not specified"}
       Current Code:
