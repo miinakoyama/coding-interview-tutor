@@ -150,8 +150,15 @@ export function InterviewSession({ problem }: InterviewSessionProps) {
       .padStart(2, "0")}`;
   };
 
-  const { isRecording, isSpeaking, startRecording, stopRecording, speak } =
-    useWebSpeech();
+  const {
+    isRecording,
+    isSpeaking,
+    startRecording,
+    stopRecording,
+    speak,
+    transcript,
+    clearTranscript,
+  } = useWebSpeech();
 
   // Sync speech state
   useEffect(() => {
@@ -404,6 +411,8 @@ export function InterviewSession({ problem }: InterviewSessionProps) {
             isSpeaking={isSpeaking}
             voiceEnabled={settings.voiceEnabled}
             onRequestHint={handleRequestHint}
+            transcript={transcript}
+            onTranscriptReset={clearTranscript}
           />
         </div>
       </div>

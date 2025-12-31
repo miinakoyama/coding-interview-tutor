@@ -11,6 +11,7 @@ interface UseWebSpeechReturn {
     speak: (text: string) => void;
     stopSpeaking: () => void;
     error: string | null;
+    clearTranscript: () => void;
 }
 
 export function useWebSpeech(): UseWebSpeechReturn {
@@ -40,7 +41,7 @@ export function useWebSpeech(): UseWebSpeechReturn {
                         }
                     }
                     if (finalTranscript) {
-                        setTranscript(prev => prev + ' ' + finalTranscript);
+                        setTranscript(prev => (prev ? prev + ' ' : '') + finalTranscript);
                     }
                 };
 
@@ -64,6 +65,10 @@ export function useWebSpeech(): UseWebSpeechReturn {
                 setError('Speech synthesis not supported in this browser.');
             }
         }
+    }, []);
+
+    const clearTranscript = useCallback(() => {
+        setTranscript('');
     }, []);
 
     const startRecording = useCallback(() => {
@@ -110,6 +115,7 @@ export function useWebSpeech(): UseWebSpeechReturn {
         isRecording,
         isSpeaking,
         transcript,
+        clearTranscript,
         startRecording,
         stopRecording,
         speak,

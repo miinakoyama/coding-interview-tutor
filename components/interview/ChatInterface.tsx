@@ -14,6 +14,8 @@ interface ChatInterfaceProps {
     isSpeaking: boolean;
     voiceEnabled?: boolean;
     onRequestHint?: () => void;
+    transcript?: string;
+    onTranscriptReset?: () => void;
 }
 
 export function ChatInterface({
@@ -23,7 +25,9 @@ export function ChatInterface({
     onToggleRecording,
     isSpeaking,
     voiceEnabled = true,
-    onRequestHint
+    onRequestHint,
+    transcript,
+    onTranscriptReset
 }: ChatInterfaceProps) {
     const [input, setInput] = useState('');
     const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -52,6 +56,14 @@ export function ChatInterface({
             textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
         }
     }, [input]);
+
+    // Update input when transcript changes
+    useEffect(() => {
+        if (transcript && onTranscriptReset) {
+            setInput(prev => (prev ? prev + ' ' : '') + transcript);
+            onTranscriptReset();
+        }
+    }, [transcript, onTranscriptReset]);
 
     return (
         <div className="flex flex-col h-full bg-white border rounded-md shadow-sm overflow-hidden">
